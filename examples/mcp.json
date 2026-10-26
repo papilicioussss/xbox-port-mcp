@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "xbox-port": {
+      "command": "C:/Tools/xbox-port-mcp/.venv/Scripts/python.exe",
+      "args": [
+        "-m",
+        "xbox_port_mcp"
+      ],
+      "env": {
+        "XBOX_PORT_WORKSPACE_ROOT": "D:/XboxPorts",
+        "XBOX_PORT_INPUT_ROOTS": "[\"D:/MyXboxGames\"]",
+        "XBOX_PORT_ALLOW_EXECUTION": "0",
+        "XBOX_PORT_ALLOW_NETWORK": "0"
+      }
+    }
+  }
+}

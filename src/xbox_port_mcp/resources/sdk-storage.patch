@@ -1,0 +1,108 @@
+diff --git a/runtime/kernel/boot.cpp b/runtime/kernel/boot.cpp
+index 9fc79d1..5e8a45b 100644
+--- a/runtime/kernel/boot.cpp
++++ b/runtime/kernel/boot.cpp
+@@ -2,6 +2,8 @@
+ #include <cstring>
+ #include <cstdlib>
+ #include <fstream>
++#include <cstdio>
++#include <filesystem>
+ 
+ #include "app/app.h"
+ #include "kernel/kernel.h"
+@@ -14,6 +16,7 @@
+ #define WIN32_LEAN_AND_MEAN
+ #endif
+ #include <windows.h>
++#undef CreateSymbolicLink  // Use the virtual Xbox link API declared in kernel.h.
+ #else
+ #include <sys/socket.h>
+ #include <sys/syscall.h>  // SYS_pidfd_open: glibc 2.44's <sys/pidfd.h> declares pidfd_open with C++
+@@ -152,6 +155,30 @@ bool Boot(std::vector<uint8_t> xbe, const std::string& xbe_name, const std::stri
+     LOGI("boot: kernel imports resolved, %u missing", missing);
+ 
+     MountDefaults(game_dir, data_dir);
++    // Xbox title storage lives under the title ID on the data partition.
++    constexpr uint32_t kDontSetupHarddisk = 0x00000008;
++    if (!(img.init_flags & kDontSetupHarddisk)) {
++        char title[9];
++        std::snprintf(title, sizeof(title), "%08X", unsigned(img.title_id));
++        auto mount_title = [&](const char* drive, const char* area) {
++            std::string target = std::string("\\Device\\Harddisk0\\Partition1\\") + area + "\\" + title;
++            std::string host = ResolvePath(target, 0);
++            std::error_code ec;
++            if (!host.empty()) std::filesystem::create_directories(host, ec);
++            if (host.empty() || ec) {
++                LOGE("boot: cannot prepare %s title storage: %s", drive,
++                     host.empty() ? "unmapped data partition" : ec.message().c_str());
++                return false;
++            }
++            return CreateSymbolicLink(std::string("\\??\\") + drive, target);
++        };
++        if (!mount_title("U:", "UDATA") || !mount_title("T:", "TDATA")) return false;
++    }
++
++    // The image requests the utility cache before its entry point runs.
++    constexpr uint32_t kMountUtilityDrive = 0x00000001;
++    if (img.init_flags & kMountUtilityDrive)
++        CreateSymbolicLink("\\??\\Z:", "\\Device\\Harddisk0\\Partition5");
+ 
+     // a quick reboot into this title left its launch data page behind
+     g_launch_file = data_dir + "/launch.bin";
+diff --git a/tools/recomp/codegen.cpp b/tools/recomp/codegen.cpp
+index c9bffa8..ec5391d 100644
+--- a/tools/recomp/codegen.cpp
++++ b/tools/recomp/codegen.cpp
+@@ -8,7 +8,9 @@
+ 
+ namespace fs = std::filesystem;
+ 
++#if defined(__clang__) || defined(__GNUC__)
+ static std::string Fmt(const char* f, ...) __attribute__((format(printf, 1, 2)));
++#endif
+ static std::string Fmt(const char* f, ...) {
+     char buf[1024];
+     va_list ap;
+diff --git a/tools/recomp/codegen_emit.cpp b/tools/recomp/codegen_emit.cpp
+index 160d841..9023364 100644
+--- a/tools/recomp/codegen_emit.cpp
++++ b/tools/recomp/codegen_emit.cpp
+@@ -9,7 +9,9 @@
+ 
+ namespace fs = std::filesystem;
+ 
++#if defined(__clang__) || defined(__GNUC__)
+ static std::string F(const char* f, ...) __attribute__((format(printf, 1, 2)));
++#endif
+ static std::string F(const char* f, ...) {
+     char buf[1024];
+     va_list ap;
+diff --git a/tools/recomp/codegen_fp.cpp b/tools/recomp/codegen_fp.cpp
+index 559f112..fc1838b 100644
+--- a/tools/recomp/codegen_fp.cpp
++++ b/tools/recomp/codegen_fp.cpp
+@@ -3,7 +3,9 @@
+ 
+ #include "codegen.h"
+ 
++#if defined(__clang__) || defined(__GNUC__)
+ static std::string F(const char* f, ...) __attribute__((format(printf, 1, 2)));
++#endif
+ static std::string F(const char* f, ...) {
+     char buf[2048];
+     va_list ap;
+diff --git a/tools/recomp/codegen_int.cpp b/tools/recomp/codegen_int.cpp
+index 5186206..cb6efe0 100644
+--- a/tools/recomp/codegen_int.cpp
++++ b/tools/recomp/codegen_int.cpp
+@@ -4,7 +4,9 @@
+ 
+ #include "codegen.h"
+ 
++#if defined(__clang__) || defined(__GNUC__)
+ static std::string F(const char* f, ...) __attribute__((format(printf, 1, 2)));
++#endif
+ static std::string F(const char* f, ...) {
+     char buf[2048];
+     va_list ap;

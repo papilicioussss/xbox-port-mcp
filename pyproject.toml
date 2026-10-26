@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "xbox-port-mcp"
+version = "0.1.0"
+description = "Profile-driven MCP tools for original Xbox port workflows"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["mcp==2.3.0", "pillow>=10,<13"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10"]
+
+[project.scripts]
+xbox-port-mcp = "xbox_port_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/xbox_port_mcp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,0 +1,18 @@
+{
+  "id": "sims-bustin-out-usa",
+  "name": "Los Sims toman la calle",
+  "title_id": "45410043",
+  "executable": "SimsBustinOut.exe",
+  "xbe": "default.xbe",
+  "repository": "https://github.com/abilliontokens/bustinout-recomp.git",
+  "commit": "e37436806c5107ee0ed4cb4d5c7a62b4c72eb613",
+  "sdk_repository": "https://github.com/abilliontokens/XboxXBERecomp.git",
+  "sdk_commit": "adc40ab688be14da932514bd9f6f59a29dab3c65",
+  "preset": "release",
+  "known_xbe_sha1": {
+    "cd46fd3bf40471823076ca795fec9b1feda4f984": "Local workflow: household, Spanish text, save/reload and installed launch reported by a human. Not a complete playthrough.",
+    "6feea04a12fb134253abe2b5662da634d0048232": "Hash documented by the upstream project; not exercised by this MCP's author."
+  },
+  "notes": "An existing game-specific port is required. This profile is not a universal Xbox converter. A successful process is not evidence of playability.",
+  "art_video": "sims_attract.xmv"
+}
