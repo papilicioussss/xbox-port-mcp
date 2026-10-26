@@ -9,7 +9,7 @@ Comprobaciones locales del 26 de octubre de 2026, Windows x64:
 - Empaquetado: prueba real con Inno Setup 6.7.3 y Windows IMAPI, exclusivamente con archivos sintéticos. Instalador compilado, ISO de 3.473.408 bytes y hash del instalador interno verificado. No se ejecutó el falso juego sintético.
 - Identificación adicional: XBE local de Sims reconocido como title ID 45410043 y SHA-1 cd46fd3bf40471823076ca795fec9b1feda4f984.
 - Revisión independiente: cuatro hallazgos importantes reproducidos con pruebas fallidas y corregidos; suite completa aprobada después.
-- Paquete wheel y fuente sdist construidos localmente. CI para Windows/Ubuntu configurada; aún no ejecutada en GitHub.
+- Paquete wheel y fuente sdist construidos localmente. Paquete instalado e importado con su perfil y plantilla incluidos. [CI de GitHub](https://github.com/papilicioussss/xbox-port-mcp/actions/runs/40341056999): las cuatro combinaciones Windows/Ubuntu y Python 3.11/3.13 finalizaron correctamente (código 84765ceedcf6f051616981914e36e6d0caa4fad8).
 
 ## Límites de esta evidencia
 
